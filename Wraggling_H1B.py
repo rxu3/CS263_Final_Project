@@ -103,15 +103,13 @@ for command in commands:
 	cur.execute(command)
 	conn.commit()
 
-with open('/Users/ranxu/Documents/GradStudy/CS263/Final_Project/postgres_h1b/H-1B_FY16.csv') as f:
+with open('H-1B_FY16.csv') as f:
 	cur.copy_expert('''COPY temp FROM STDIN DELIMITER ',' CSV HEADER encoding 'windows-1251';''',f)
 f.close()
 
 
 commands2=(
-	#'''
-	#COPY temp FROM '/Users/ranxu/Documents/GradStudy/CS263/Final_Project/postgres_h1b/H-1B_FY16.csv' DELIMITER ',' CSV HEADER encoding 'windows-1251';
-	#''',
+	
 	#only select certain columns that we care most.
 	'''
 	INSERT INTO H1B_16(CASE_NUMBER,CASE_STATUS,VISA_CLASS,EMPLOYER_NAME,JOB_TITLE,TOTAL_WORKERS,WORKSITE_CITY,WORKSITE_COUNTY,WORKSITE_STATE,PREVAILING_WAGE)
@@ -128,10 +126,8 @@ commands2=(
 	FROM H1B_16
 	GROUP BY CASE_STATUS;
 	''',
-	#SAVE THE RESULT TO A FILE
-	#'''
-	#COPY STATUS_ALL_CASE TO '/Users/ranxu/Documents/GradStudy/CS263/Final_Project/postgres_h1b/STATUS_ALL_CASE.csv' DELIMITER ',' CSV HEADER
-	#''',
+	
+	
 	#ANALYSIS OF THE STATUS IN EACH EMPLOYER, BY JOINNING OF TWO FOLLOWING TABLES, WE CAN GET THE RATIO OF CERTIFIED H1B IN EACH EMPLOYER
 	'''
 	CREATE TABLE STATUS_EMPLOYER AS 
@@ -139,7 +135,6 @@ commands2=(
 	FROM H1B_16
 	GROUP BY EMPLOYER_NAME ORDER BY COUNT(CASE_NUMBER) DESC;
 	''',
-#
 	'''
 	CREATE TABLE STATUS_EMPLOYER_CERTIFIED AS SELECT EMPLOYER_NAME , COUNT(CASE_NUMBER) AS CERTIFIED_NUMBER, SUM(TOTAL_WORKERS) AS CERTIFIED_TOTAL_WORKERS FROM H1B_16 WHERE CASE_STATUS = 'CERTIFIED' GROUP BY EMPLOYER_NAME;
 	''',
@@ -152,8 +147,7 @@ commands2=(
 	'''
 	CREATE TABLE STATUS_JOB_TITLE AS SELECT JOB_TITLE,COUNT(CASE_NUMBER) FROM H1B_16 WHERE CASE_STATUS = 'CERTIFIED' GROUP BY JOB_TITLE ORDER BY COUNT(CASE_NUMBER) DESC;
 	'''
-	#COPY EMPLOYER_RATIO_STATUS TO '/Users/ranxu/Documents/GradStudy/CS263/Final_Project/postgres_h1b/EMPLOYER_RATIO_STATUS.csv' DELIMITER ',' CSV HEADER;
-	#'''
+	
 
 )
 for command in commands2:
@@ -162,16 +156,16 @@ for command in commands2:
 	cur.execute(command)
 	conn.commit()
 
-with open('/Users/ranxu/Documents/GradStudy/CS263/Final_Project/postgres_h1b/STATUS_ALL_CASE.csv','w') as f1:
+with open('STATUS_ALL_CASE.csv','w') as f1:
 	cur.copy_expert('''COPY STATUS_ALL_CASE to STDOUT DELIMITER ',' CSV HEADER encoding 'windows-1251';''',f1)
 f1.close()
 
 
-with open('/Users/ranxu/Documents/GradStudy/CS263/Final_Project/postgres_h1b/EMPLOYER_RATIO_STATUS.csv','w') as f2:
+with open('EMPLOYER_RATIO_STATUS.csv','w') as f2:
 	cur.copy_expert('''COPY EMPLOYER_RATIO_STATUS to STDOUT DELIMITER ',' CSV HEADER encoding 'windows-1251';''',f2)
 f2.close()
 
-with open('/Users/ranxu/Documents/GradStudy/CS263/Final_Project/postgres_h1b/STATUS_JOB_TITLE.csv','w') as f3:
+with open('STATUS_JOB_TITLE.csv','w') as f3:
 	cur.copy_expert('''COPY STATUS_JOB_TITLE to STDOUT DELIMITER ',' CSV HEADER encoding 'windows-1251';''',f3)
 f3.close()
 
@@ -181,7 +175,7 @@ conn.close()
 print '\nClosed connection to databsed'
 
 
-# with open('/Users/ranxu/Documents/GradStudy/CS263/Final_Project/postgres_h1b/EMPLOYER_RATIO_STATUS.csv','wr') as f4:
+# with open('EMPLOYER_RATIO_STATUS.csv','wr') as f4:
 
 	
 # f4.close()
